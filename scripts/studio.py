@@ -5,7 +5,9 @@ Chrome/Edge/Chromium/Brave that's already on the machine. Standard library only,
   studio.py doctor                          which browser will render
   studio.py sizes                           the size presets
   studio.py render <in.html|in.svg> <out.png> [--preset NAME | --size WxH] [--scale N] [--check]
+                                            renders at 2x by default (sharp on retina); --scale 1 for exact pixels.
                                             --check also writes <out>.check.png (max 800 px wide) to look at
+  studio.py zoom <in.png> <x,y,w,h> [out.png]   full-resolution crop (in image pixels) to inspect details
   studio.py icons <logo.svg> [out_dir] [--bg #hex] [--name "App"]
                                             favicon.ico/.svg, apple-touch-icon, PWA icons, site.webmanifest
   studio.py brand [path]                    show the brand kit in use (./studio/brand.json, else ~/.basivo-studio/brand.json)
@@ -135,6 +137,19 @@ def _img_page(png):
             f"</style><img src='{pathlib.Path(png).as_uri()}'>")
 
 
+def zoom(png, box, out=None):
+    """Crop a region of a PNG at full resolution (max 800 px wide), to check fine detail cheaply."""
+    x, y, w, h = (int(float(v)) for v in box.split(","))
+    out = out or png[:-4] + ".zoom.png"
+    iw, ih = png_size(png)
+    page = (f"<!doctype html><style>html,body{{margin:0;background:transparent;overflow:hidden}}"
+            f"img{{position:absolute;left:{-x}px;top:{-y}px;width:{iw}px;height:{ih}px}}</style>"
+            f"<img src='{pathlib.Path(os.path.abspath(png)).as_uri()}'>")
+    s = min(1.0, 800 / w)
+    render(None, out, w, h, s, html=page)
+    return out
+
+
 def write_ico(pngs, out):
     """ICO file with PNG-compressed entries (supported by every browser and Windows Vista+)."""
     datas = [open(p, "rb").read() for p in pngs]
@@ -202,13 +217,13 @@ def main(argv):
             print(f"{k:20} {w}x{h:<6} {what}")
     elif cmd == "render" and len(args) >= 2:
         preset, size = _opt(args, "--preset"), _opt(args, "--size")
-        scale = float(_opt(args, "--scale", "1"))
+        scale = float(_opt(args, "--scale", "2"))
         check = "--check" in args
         args = [a for a in args if a != "--check"]
         if preset:
             if preset not in PRESETS:
                 sys.exit(f"unknown preset {preset}; see `studio.py sizes`")
-            w, h = PRESETS[preset][:2]
+            w, h = PRESETS[preset][:2]  # CSS px; the PNG is w*scale x h*scale
         elif size:
             w, h = (int(x) for x in size.lower().split("x"))
         else:
@@ -218,6 +233,8 @@ def main(argv):
         if check:
             out["check"] = check_copy(os.path.abspath(args[1]), w, h, scale)
         print(json.dumps(out))
+    elif cmd == "zoom" and len(args) >= 2:
+        print(json.dumps({"ok": True, "out": zoom(args[0], args[1], args[2] if len(args) > 2 else None)}))
     elif cmd == "icons" and args:
         bg, name = _opt(args, "--bg"), _opt(args, "--name", "App")
         print(json.dumps(icons(args[0], args[1] if len(args) > 1 else "icons", bg, name), indent=2))

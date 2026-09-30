@@ -14,8 +14,9 @@ and the result is editable.
 ## Workflow
 
 1. **Brand first.** `$S brand`. If there's a kit, use its colours, fonts and logo on
-   every image. If not and the work is brand-related, offer `/studio-brand` (one
-   question round), otherwise pick a small palette and say which.
+   every image. If not, take them from the project: the app's theme (Tailwind `@theme`,
+   CSS variables, `tailwind.config`), an existing logo or favicon, the README. Only if
+   there's nothing, pick a small palette and say which (and offer `/studio-brand`).
 2. **Workspace.** Put sources and outputs in `studio/<slug>/` in the current project
    (or where the user asks). Keep the `.html`/`.svg` source next to the PNG so it can
    be edited later.
@@ -23,11 +24,14 @@ and the result is editable.
    (`<link>`), images by relative path or data URI. Size the root element to exactly
    the preset (`$S sizes`), `margin:0`.
 4. **Render with a check copy:** `$S render in.html out.png --preset og --check`.
-   Use `--scale 2` for crisp final exports.
-5. **Look before you hand over.** Read the `check` PNG (max 800 px wide, cheap). Fix
-   clipping, overflow, low contrast, cramped margins, widows, and anything that looks
-   templated. At most 2 fix rounds, then show the user.
-6. **Hand over:** the PNG path(s), what you made in one line, and offer one change.
+   Output is 2x (sharp on retina screens); `--scale 1` only when a platform needs exact
+   pixels.
+5. **Look before you hand over.** Read the `check` PNG (max 800 px wide, cheap) for the
+   layout, and `$S zoom out.png x,y,w,h` for small text and fine detail. Fix clipping,
+   overflow, low contrast, cramped margins, widows, floating or misaligned accents, and
+   anything that looks templated. At most 2 fix rounds, then show the user.
+6. **Hand over:** open the PNG for the user (`open` / `start ""` / `xdg-open`), give its
+   path, say what you made in one line, and offer one change.
 
 ## Design rules (the "not AI-looking" part)
 
@@ -56,7 +60,7 @@ and the result is editable.
 ## Tokens
 
 Write the file once, then make targeted edits; don't re-read your own source. Look at
-`check` copies, never the full-size export, and only after a change. Use
+`check` copies and `zoom` crops, never the full-size export, and only after a change. Use
 `$S icons` for icon sets instead of rendering sizes one by one.
 
 ## Can't do

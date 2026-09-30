@@ -1,6 +1,6 @@
 {
   "name": "basivo-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Logos, icons, favicons, blog covers, social images, thumbnails, quote cards, carousels and diagrams for Claude Code. Claude designs in SVG and HTML, and a local headless Chrome/Edge renders pixel-exact PNGs, so text is always spelled right, logos stay vector and nothing looks AI-generated. Standard-library Python, any OS.",
   "author": {
     "name": "Basivo",

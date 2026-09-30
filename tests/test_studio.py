@@ -60,12 +60,14 @@ with tempfile.TemporaryDirectory() as t:
     html = os.path.join(t, "card.html")
     open(html, "w").write("<!doctype html><style>html,body{margin:0;background:transparent}"
                           "div{width:1200px;height:630px;background:#123;border-radius:60px}</style><div></div>")
-    r = json.loads(run("render", html, os.path.join(t, "out", "card.png"), "--preset", "og", "--check"))
+    r = json.loads(run("render", html, os.path.join(t, "out", "card.png"), "--preset", "og", "--check", "--scale", "1"))
     assert r["pixels"] == "1200x630" and size(r["check"]) == (800, 420), r
     assert pixel_alpha(r["out"], 0, 0) == 0 and pixel_alpha(r["out"], 600, 300) == 255, "transparent corners, solid centre"
-    r = json.loads(run("render", html, os.path.join(t, "card@2x.png"), "--size", "600x300", "--scale", "2"))
-    assert r["pixels"] == "1200x600", r
-    print("PASS  render: presets, --size, --scale, check copy, transparency")
+    r = json.loads(run("render", html, os.path.join(t, "card@2x.png"), "--size", "600x300"))
+    assert r["pixels"] == "1200x600", "2x by default: " + r["pixels"]
+    z = json.loads(run("zoom", r["out"], "0,0,100,50"))["out"]
+    assert size(z) == (100, 50) and pixel_alpha(z, 0, 0) == 0 and pixel_alpha(z, 99, 49) == 255, "zoom crops at full resolution"
+    print("PASS  render: presets, --size, 2x default, --scale, check copy, zoom, transparency")
 
     svg = os.path.join(t, "mark.svg")
     open(svg, "w").write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#e11d48"/></svg>')

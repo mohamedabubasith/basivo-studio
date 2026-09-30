@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.1] - 2026-09-30
+
+### Fixed
+- Images were rendered at 1x and looked soft on retina screens. Everything now
+  renders at 2x by default (`--scale 1` for exact pixels).
+- Logos looked amateur: the logo guide now requires geometric construction on a
+  grid (true arcs, one stroke weight, mirrored symmetry, no floating accents),
+  HTML wordmarks with ligatures off, a board with a 64/32/16 px row, and a scored
+  critique of every concept at 512 px before the user sees it.
+- Colours and fonts now come from the project's theme (Tailwind, CSS variables,
+  existing logo) when there's no brand kit, instead of an invented palette.
+
+### Added
+- `studio.py zoom <png> x,y,w,h`: a full-resolution crop to check fine detail.
+- The finished image is opened for the user.
+
 ## [0.1.0] - 2026-09-30
 
 ### Added
